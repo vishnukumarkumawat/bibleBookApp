@@ -1,0 +1,326 @@
+{
+  "swagger": "2.0",
+  "info": {
+    "title": "Bible App API",
+    "version": "1.0.0",
+    "description": "User registration API for Bible App"
+  },
+  "host": "69.49.234.138:3010",
+  "basePath": "/",
+  "schemes": ["http"],
+  "securityDefinitions": {
+    "bearerAuth": {
+      "type": "apiKey",
+      "name": "Authorization",
+      "in": "header",
+      "description": "JWT Authorization header using the Bearer scheme. Example: \"Bearer {token}\""
+    }
+  },
+  "paths": {
+    "/api/auth/register": {
+      "post": {
+        "summary": "Register a new user",
+        "consumes": ["application/json"],
+        "parameters": [
+          {
+            "in": "body",
+            "name": "body",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "properties": {
+                "name": { "type": "string" },
+                "email": { "type": "string" },
+                "password": { "type": "string" }
+              },
+              "required": ["name", "email", "password"]
+            }
+          }
+        ],
+        "responses": {
+          "200": { "description": "OK" },
+          "201": { "description": "Created" },
+          "400": { "description": "Bad Request" },
+          "401": { "description": "Unauthorized" },
+          "403": { "description": "Forbidden" },
+          "409": { "description": "Conflict" },
+          "500": { "description": "Internal Server Error" }
+        }
+      }
+    },
+    "/api/auth/login": {
+    "post": {
+        "summary": "Login a user",
+        "consumes": ["application/json"],
+        "parameters": [
+        {
+            "in": "body",
+            "name": "body",
+            "required": true,
+            "schema": {
+            "type": "object",
+            "properties": {
+                "email": { "type": "string" },
+                "password": { "type": "string" }
+            },
+            "required": ["email", "password"]
+            }
+        }
+        ],
+        "responses": {
+        "200": {
+            "description": "Login successful",
+            "content": {
+            "application/json": {
+                "schema": {
+                "type": "object",
+                "properties": {
+                    "status": { "type": "integer", "example": 200 },
+                    "message": { "type": "string", "example": "Login successful" },
+                    "data": {
+                    "type": "object",
+                    "properties": {
+                        "token": {
+                        "type": "string",
+                        "example": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9..."
+                        },
+                        "user": {
+                        "type": "object",
+                        "properties": {
+                            "user_id": { "type": "string", "example": "662ed5f7c9e43d01c1e01a3c" },
+                            "email": { "type": "string", "example": "john@example.com" }
+                        }
+                        }
+                    }
+                    }
+                }
+                }
+            }
+            }
+        },
+          "400": { "description": "Bad Request" },
+          "403": { "description": "Forbidden" },
+          "500": { "description": "Internal Server Error" }
+        }
+    }
+    },
+    "/api/v1/bible/getBookList": {
+    "get": {
+    "tags": ["Bible"],
+    "summary": "Get list of all books",
+    "security": [
+      {
+        "bearerAuth": []
+      }
+    ],
+    "responses": {
+      "200": {
+        "description": "List of books retrieved successfully",
+        "content": {
+          "application/json": {
+            "example": {
+              "success": true,
+              "data": [
+                {
+                  "_id": "660123abc456def7890123gh",
+                  "name": "Genesis",
+                  "status": 1
+                }
+              ]
+            }
+          }
+        }
+      },
+      "401": {
+        "description": "Unauthorized - Missing or invalid token"
+      },
+      "500": {
+        "description": "Internal Server Error"
+      }
+    }
+     }
+    },
+    "/api/v1/bible/getVersionList": {
+    "post": {
+        "tags": ["Bible"],
+        "summary": "Get list of all versions by book ID",
+        "description": "Returns versions associated with the given book ID.",
+        "consumes": ["application/json"],
+        "produces": ["application/json"],
+        "security": [
+        {
+            "bearerAuth": []
+        }
+        ],
+        "parameters": [
+        {
+            "in": "body",
+            "name": "body",
+            "required": true,
+            "schema": {
+            "type": "object",
+            "properties": {
+                "book_id": {
+                "type": "string",
+                "example": "681ef896422cdc36200e3a12"
+                }
+            },
+            "required": ["book_id"]
+            }
+        }
+        ],
+        "responses": {
+        "200": {
+            "description": "List of versions retrieved successfully",
+            "content": {
+            "application/json": {
+                "example": {
+                "success": true,
+                "data": [
+                    {
+                    "_id": "6820010d2e37da9a3d5cbcf1",
+                    "book_id": "681ef896422cdc36200e3a12",
+                    "name": "Genesis Version 1",
+                    "createdAt": "2025-05-10T07:00:00.000Z",
+                    "updatedAt": "2025-05-10T07:00:00.000Z"
+                    }
+                ]
+                }
+            }
+            }
+        },
+        "400": { "description": "Bad Request - book_id missing or invalid" },
+        "401": { "description": "Unauthorized - Invalid or missing JWT" },
+        "500": { "description": "Internal Server Error" }
+        }
+    }
+   },
+    "/api/v1/bible/getVersesList": {
+      "post": {
+        "tags": ["Bible"],
+        "summary": "Get list of verses by book_id and version_id",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "parameters": [
+          {
+            "in": "body",
+            "name": "body",
+            "required": true,
+            "schema": {
+              "type": "object",
+              "properties": {
+                "book_id": {
+                  "type": "string",
+                  "example": "681ef896422cdc36200e3a12",
+                  "description": "ID of the book"
+                },
+                "version_id": {
+                  "type": "string",
+                  "example": "681f00f36cad5807c4d97ae3",
+                  "description": "ID of the version"
+                }
+              },
+              "required": ["book_id", "version_id"]
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "List of verses retrieved successfully",
+            "content": {
+              "application/json": {
+                "example": {
+                  "success": true,
+                  "data": [
+                    {
+                      "_id": "12345",
+                      "book_id": "681ef896422cdc36200e3a12",
+                      "version_id": "681f00f36cad5807c4d97ae3",
+                      "title": "Genesis 1:1",
+                      "content": "In the beginning, God created the heavens and the earth."
+                    }
+                  ]
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request - Invalid input or missing fields"
+          },
+          "401": {
+            "description": "Unauthorized - Missing or invalid token"
+          },
+          "500": {
+            "description": "Internal Server Error"
+          }
+        }
+      }
+    },
+
+    "/api/v1/bible/markVerseAsRead": {
+    "post": {
+      "tags": ["Bible"],
+      "summary": "Progress Track Api",
+      "security": [
+        {
+          "bearerAuth": []
+        }
+      ],
+      "parameters": [
+        {
+          "in": "body",
+          "name": "body",
+          "required": true,
+          "schema": {
+            "type": "object",
+            "properties": {
+              "verse_id": {
+                "type": "string",
+                "example": "60b2b7f8e7c14c5d32a983c6",
+                "description": "ID of the verse to be marked as read"
+              },
+              "is_mark_read": {
+                "type": "integer",
+                "example": 1,
+                "description": "Set to 1 to mark the verse as read"
+              }
+            },
+            "required": ["verse_id", "is_mark_read"]
+          }
+        }
+      ],
+      "responses": {
+        "200": {
+          "description": "Verse marked as read successfully",
+          "content": {
+            "application/json": {
+              "example": {
+                "success": true,
+                "message": "Verse marked as read successfully"
+              }
+            }
+          }
+        },
+        "400": {
+          "description": "Bad Request - Invalid input or missing fields"
+        },
+        "401": {
+          "description": "Unauthorized - Missing or invalid token"
+        },
+        "404": {
+          "description": "Not Found - Verse not found"
+        },
+        "500": {
+          "description": "Internal Server Error"
+        }
+      }
+    }
+  }
+  }
+}
+
+
+
